@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Analysis Results | SkillMatch{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><div class="eyebrow"><span class="eyebrow-dot"></span> ANALYSIS COMPLETE</div><h1>Your match <span class="gradient-text">report.</span></h1><p>Role: <strong>{{ job_title }}</strong> · File: {{ filename }}</p></div>
+  <a class="secondary-button" href="{{ url_for('index') }}">← New analysis</a>
+</div>
+<section class="result-grid">
+  <div class="result-main">
+    <div class="score-card">
+      <div><span class="subtle">SKILL OVERLAP SCORE</span><h2>How closely your detected skills align</h2><p>This score measures detected skill overlap only. It is not a hiring probability or an ATS score.</p></div>
+      <div class="score-ring" style="--score: {{ score * 3.6 }}deg"><div><strong>{{ score|round|int }}<small>%</small></strong><span>match</span></div></div>
+    </div>
+    <div class="metric-row">
+      <div class="metric-card"><span class="metric-icon green-bg">✓</span><strong>{{ matched|length }}</strong><span>Matched skills</span></div>
+      <div class="metric-card"><span class="metric-icon orange-bg">↗</span><strong>{{ missing|length }}</strong><span>Skills to review</span></div>
+      <div class="metric-card"><span class="metric-icon blue-bg">⌘</span><strong>{{ resume_skill_count }}</strong><span>Skills detected in resume</span></div>
+    </div>
+    <div class="content-card">
+      <div class="card-heading"><div><span class="card-kicker">SKILL BREAKDOWN</span><h2>Role requirements</h2></div></div>
+      <div class="skill-columns">
+        <div><h3><i class="dot green"></i> Matched skills <span>{{ matched|length }}</span></h3>
+          <div class="skill-list">{% for skill in matched %}<span class="skill-chip matched">{{ skill }}</span>{% else %}<p class="empty-text">No matching skills detected yet.</p>{% endfor %}</div>
+        </div>
+        <div><h3><i class="dot orange"></i> Skills to review <span>{{ missing|length }}</span></h3>
+          <div class="skill-list">{% for skill in missing %}<span class="skill-chip missing">{{ skill }}</span>{% else %}<p class="empty-text">All detected job skills also appear in your resume.</p>{% endfor %}</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="skillsChart" aria-label="Matched and missing skills chart"></canvas></div>
+    </div>
+    <div class="content-card">
+      <div class="card-heading"><div><span class="card-kicker">NEXT STEPS</span><h2>Suggestions to strengthen your resume</h2></div></div>
+      <ul class="suggestion-list">{% for suggestion in suggestions %}<li><span>✦</span><div>{{ suggestion }}</div></li>{% endfor %}</ul>
+      <p class="subtle small">Only include skills and experience you can honestly demonstrate. Keyword matching can miss synonyms and context.</p>
+    </div>
+  </div>
+  <aside class="result-aside">
+    <div class="content-card">
+      <span class="card-kicker">ANALYSIS SUMMARY</span><h2>At a glance</h2>
+      <div class="summary-line"><span>Target role</span><strong>{{ job_title }}</strong></div>
+      <div class="summary-line"><span>Requirements detected</span><strong>{{ job_skills|length }}</strong></div>
+      <div class="summary-line"><span>Matched</span><strong class="text-green">{{ matched|length }}</strong></div>
+      <div class="summary-line"><span>To review</span><strong class="text-orange">{{ missing|length }}</strong></div>
+      <div class="aside-actions"><a class="primary-button" href="{{ url_for('history_detail', analysis_id=analysis_id) }}">View saved report →</a><a class="secondary-button full-width" href="{{ url_for('history') }}">Open history</a></div>
+    </div>
+    <div class="tip-card"><span class="tip-star">✦</span><strong>Remember</strong><p>A resume is more than keywords. Use specific project examples and outcomes to show how you apply your skills.</p></div>
+  </aside>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+const ctx = document.getElementById("skillsChart");
+new Chart(ctx, {
+  type: "doughnut",
+  data: { labels: ["Matched skills", "Skills to review"], datasets: [{ data: [{{ matched|length }}, {{ missing|length }}], backgroundColor: ["#20a879", "#f4a340"], borderWidth: 0, hoverOffset: 5 }] },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, cutout: "68%" }
+});
+</script>
+{% endblock %}

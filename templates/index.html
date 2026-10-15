@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}SkillMatch | Analyze your resume{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="eyebrow"><span class="eyebrow-dot"></span> CAREER READINESS TOOL</div>
+  <h1>Make your next move<br><span class="gradient-text">with confidence.</span></h1>
+  <p>Compare your resume with a job description, discover matching skills, and identify areas to strengthen before you apply.</p>
+  <div class="hero-tags"><span>✓ PDF resume parsing</span><span>✓ Skill-gap insights</span><span>✓ Analysis history</span></div>
+</section>
+<section class="workspace">
+  <div class="form-panel">
+    <div class="section-heading"><div><span class="step">01</span><h2>Upload your resume</h2></div><span class="subtle">PDF · Max 5 MB</span></div>
+    <form action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data" id="analyze-form">
+      <label class="upload-zone" for="resume">
+        <span class="upload-icon">↑</span>
+        <strong id="file-label">Choose your resume PDF</strong>
+        <span>Click to browse files from your device</span>
+        <input id="resume" name="resume" type="file" accept=".pdf,application/pdf" required>
+      </label>
+      <div class="section-heading job-heading"><div><span class="step">02</span><h2>Choose your target role</h2></div></div>
+      <label class="field-label" for="job_title">Job title</label>
+      <input class="text-input" id="job_title" name="job_title" placeholder="e.g. Python Developer">
+      <label class="field-label" for="sample_job">Start with a sample job (optional)</label>
+      <select class="text-input" id="sample_job" name="sample_job">
+        <option value="">Choose a sample role</option>
+        {% for name in sample_jobs.keys() %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+      </select>
+      <label class="field-label" for="job_description">Job description</label>
+      <textarea class="text-input textarea" id="job_description" name="job_description" rows="7" placeholder="Paste the job description here, or choose a sample role above..."></textarea>
+      <div class="privacy-note"><span>♧</span><span>Your resume is parsed in memory and is not saved as an uploaded file. Analysis results and the original filename are saved locally in the database.</span></div>
+      <button class="primary-button" type="submit">Analyze resume <span>→</span></button>
+    </form>
+  </div>
+  <aside class="side-panel">
+    <div class="side-top"><div class="mini-icon">✦</div><span class="subtle">YOUR CAREER TOOLKIT</span></div>
+    <h3>Know your strengths.<br>Close your skill gaps.</h3>
+    <p>Get a quick, understandable view of how your resume lines up with the role you want.</p>
+    <div class="preview-card">
+      <div class="preview-top"><span>SKILL MATCH PREVIEW</span><span class="preview-pill">DEMO</span></div>
+      <div class="preview-score"><strong>78%</strong><span>illustrative score</span></div>
+      <div class="meter"><span style="width:78%"></span></div>
+      <div class="preview-legend"><span><i class="dot green"></i>Matched skills</span><span><i class="dot orange"></i>Skill gaps</span></div>
+      <div class="fake-skills"><span>Python</span><span>SQL</span><span>Flask</span><span class="missing">Docker</span><span class="missing">AWS</span></div>
+      <p class="demo-note">Example only — your result is calculated from your uploaded resume and job description.</p>
+    </div>
+    <div class="how-card"><strong>How it works</strong><div><span>1</span> Extract resume text from PDF</div><div><span>2</span> Detect relevant skills</div><div><span>3</span> Compare and suggest next steps</div></div>
+  </aside>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+const fileInput = document.getElementById("resume");
+fileInput.addEventListener("change", () => {
+  document.getElementById("file-label").textContent = fileInput.files.length ? fileInput.files[0].name : "Choose your resume PDF";
+});
+const samples = {{ sample_jobs|tojson }};
+const sampleSelect = document.getElementById("sample_job");
+sampleSelect.addEventListener("change", () => {
+  const role = sampleSelect.value;
+  if (role) {
+    document.getElementById("job_title").value = role;
+    document.getElementById("job_description").value = samples[role];
+  }
+});
+document.getElementById("analyze-form").addEventListener("submit", (event) => {
+  if (!fileInput.files.length) {
+    event.preventDefault();
+    alert("Please choose a PDF resume.");
+  }
+});
+</script>
+{% endblock %}

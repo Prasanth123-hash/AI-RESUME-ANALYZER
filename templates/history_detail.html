@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Saved Report | SkillMatch{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow"><span class="eyebrow-dot"></span> SAVED REPORT</div><h1>Analysis <span class="gradient-text">details.</span></h1><p>{{ item.job_title }} · {{ item.created_at }}</p></div><a class="secondary-button" href="{{ url_for('history') }}">← Back to history</a></div>
+<div class="content-card saved-report">
+  <div class="saved-score"><strong>{{ item.match_score|round|int }}%</strong><span>skill overlap</span></div>
+  <div class="summary-line"><span>Resume filename</span><strong>{{ item.filename }}</strong></div>
+  <div class="summary-line"><span>Target role</span><strong>{{ item.job_title }}</strong></div>
+  <h3>Matched skills</h3><div class="skill-list">{% for skill in item.matched_skills.split(', ') if skill %}<span class="skill-chip matched">{{ skill }}</span>{% else %}<span class="empty-text">None detected</span>{% endfor %}</div>
+  <h3>Skills to review</h3><div class="skill-list">{% for skill in item.missing_skills.split(', ') if skill %}<span class="skill-chip missing">{{ skill }}</span>{% else %}<span class="empty-text">None detected</span>{% endfor %}</div>
+  <h3>Suggestions</h3><ul class="suggestion-list">{% for suggestion in item.suggestions.split('\n') if suggestion %}<li><span>✦</span><div>{{ suggestion }}</div></li>{% endfor %}</ul>
+  <p class="subtle small">This saved report contains skill overlap analysis, not a prediction of hiring outcomes.</p>
+</div>
+{% endblock %}

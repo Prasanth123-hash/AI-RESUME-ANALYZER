@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Analysis History | SkillMatch{% endblock %}
+{% block content %}
+<div class="page-head"><div><div class="eyebrow"><span class="eyebrow-dot"></span> YOUR WORKSPACE</div><h1>Analysis <span class="gradient-text">history.</span></h1><p>Review recent resume-to-role comparisons stored on this device.</p></div><a class="primary-button" href="{{ url_for('index') }}">+ New analysis</a></div>
+<div class="content-card history-card">
+  {% if analyses %}
+  <div class="table-scroll"><table><thead><tr><th>Role</th><th>Resume file</th><th>Date</th><th>Skill overlap</th><th></th></tr></thead><tbody>
+  {% for item in analyses %}
+  <tr><td><strong>{{ item.job_title }}</strong></td><td>{{ item.filename }}</td><td>{{ item.created_at }}</td><td><span class="table-score">{{ item.match_score|round|int }}%</span></td><td><a class="table-link" href="{{ url_for('history_detail', analysis_id=item.id) }}">View →</a></td></tr>
+  {% endfor %}
+  </tbody></table></div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">⌕</div><h2>No analyses yet</h2><p>Upload a PDF resume and compare it with a job description to create your first report.</p><a class="primary-button" href="{{ url_for('index') }}">Analyze a resume →</a></div>
+  {% endif %}
+</div>
+{% endblock %}
